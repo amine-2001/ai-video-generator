@@ -1,11 +1,12 @@
-import React from 'react'
+"use client"
+import React, { use, useState } from 'react'
 import {
     InputGroup,
     InputGroupAddon,
     InputGroupButton,
     InputGroupTextarea,
 } from "@/components/ui/input-group"
-import { Send } from 'lucide-react'
+import { Loader2, Send } from 'lucide-react'
 import {
     Select,
     SelectContent,
@@ -14,7 +15,35 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { QUICK_VIDEO_SUGGESTIONS } from '../data/constant'
+import axios from 'axios'
+import { toast } from 'sonner'
+import { SignInButton, useUser } from '@clerk/nextjs'
+
+
 function Hero() {
+    const [userInput, setUserInput] = useState('');
+    const [type, setType] = useState('full-course');
+    const [Loading, setLoading] = useState(false);
+    const{user}=useUser();
+    const courseId = crypto.randomUUID();
+   
+    const GenerateCourseLayout = async () => {
+        try {
+    setLoading(true);
+    const toastId = toast.loading('Generating your course layout...');
+    const result = await axios.post('/api/generate-course-layout', {
+        userInput,
+        type,
+        courseId:courseId
+    });
+    console.log(result.data);
+    toast.success('Course layout generated successfully!', { id: toastId });
+    setLoading(false);
+} catch (error) {
+    console.error(error);
+    toast.error('Failed to generate course layout. Please try again.');
+    setLoading(false);
+}}
     return (
         <div className='flex items-center justify-center flex-col mt-20'>
             <div>
@@ -28,9 +57,11 @@ function Hero() {
                         className="flex field-sizing-content min-h-24 w-full resize-none rounded-xl
                          bg-white px-3 py-2.5 text-base transition-[color,box-shadow] outline-none md:text-sm"
                         placeholder="Autoresize textarea..."
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
                     />
                     <InputGroupAddon align="block-end">
-                        <Select>
+                        <Select onValueChange={(value) => setType(value)}>
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="full-course" />
                             </SelectTrigger>
@@ -39,17 +70,29 @@ function Hero() {
                                 <SelectItem value="quick-explain">Quick Explain Video</SelectItem>
                             </SelectContent>
                         </Select>
-                        <InputGroupButton className="ml-auto" size="icon-sm" variant="default">
-                            <Send/>
+                        {user?
+                        <InputGroupButton className="ml-auto" size="icon-sm" variant="default" onClick={GenerateCourseLayout} disabled={Loading}>
+                        {
+                            Loading?<Loader2 className='animate-spin'/>:
+                            <Send />
+                        }
                         </InputGroupButton>
+                        :
+                        <SignInButton>
+                        <InputGroupButton className="ml-auto" size="icon-sm" variant="default" >
+                            <Send />
+                        </InputGroupButton>
+                        </SignInButton>
+                        }
                     </InputGroupAddon>
                 </InputGroup>
             </div>
             <div className='flex gap-5 mt-5 max-w-3xl flex-wrap justify-center z-10'>
                 {QUICK_VIDEO_SUGGESTIONS.map((suggestion,index) => (
-                    <button key={index} className='border rounded-2xl px-2 p-1 text-sm bg-white'>
+                    
+                    <h2 key={index} className='border rounded-2xl px-2 p-1 text-sm bg-white cursor-pointer' onClick={()=>setUserInput(suggestion?.prompt)}>
                         {suggestion.title}
-                    </button> 
+                    </h2> 
                 ))}
             </div>
         </div>
