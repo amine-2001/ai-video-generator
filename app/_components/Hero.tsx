@@ -18,6 +18,7 @@ import { QUICK_VIDEO_SUGGESTIONS } from '../data/constant'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { SignInButton, useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation';
 
 
 function Hero() {
@@ -25,6 +26,7 @@ function Hero() {
     const [type, setType] = useState('full-course');
     const [Loading, setLoading] = useState(false);
     const{user}=useUser();
+    const route = useRouter();
     const courseId = crypto.randomUUID();
    
     const GenerateCourseLayout = async () => {
@@ -37,8 +39,9 @@ function Hero() {
         courseId:courseId
     });
     console.log(result.data);
-    toast.success('Course layout generated successfully!', { id: toastId });
     setLoading(false);
+    toast.success('Course layout generated successfully!', { id: toastId });
+    route.push(`/course/${courseId}`);
 } catch (error) {
     console.error(error);
     toast.error('Failed to generate course layout. Please try again.');

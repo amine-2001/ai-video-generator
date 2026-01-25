@@ -1,14 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { UserButton } from "@clerk/nextjs";
-import Image from "next/image";
-import Header from "./_components/Header";
 import Hero from "./_components/Hero";
 import CourseList from "./_components/CourseList";
 
 export default function Home() {
   return (
     <>
-      <Header />
       <Hero />
       <CourseList />
       <div className="absolute -bottom-40 -left-40 h-[500px] w-[500px] bg-purple-400/20 blur-[120px] rounded-full" />

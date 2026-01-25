@@ -2,8 +2,8 @@
 import React,{ useEffect, useState } from'react';
 import axios from 'axios';
 import { UserDetailContext } from './context/UserDetailContext';
-import { Toaster } from 'sonner';
 import { useUser } from '@clerk/nextjs';
+import Header from './_components/Header';
 
 const provider = ({children} : {children: React.ReactNode}) => {
 const [userDetail, setUserDetail] = useState<any>();
@@ -25,8 +25,8 @@ const { user, isLoaded } = useUser();
     <div>
         <UserDetailContext.Provider value={{userDetail,setUserDetail}}>
           <div className='max-w-7xl mx-auto'>
+            <Header />
              {children}
-             
           </div>
        </UserDetailContext.Provider>
     </div>
