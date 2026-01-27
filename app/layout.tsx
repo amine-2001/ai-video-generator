@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { DM_Sans} from "next/font/google";
 import "./globals.css";
+import {
+  ClerkProvider,
+} from '@clerk/nextjs'
+import { Toaster } from "@/components/ui/sonner";
+import Provider from "./provider";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -18,12 +23,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+     <ClerkProvider>
+      <html lang="en">
       <body
         className={`${dmSans.variable} font-sans bg-white dark:bg-black`}
       >
-        {children}
+        <Provider>
+          {children}
+        </Provider>
+        <Toaster position='top-center' richColors/>
       </body>
     </html>
+     </ClerkProvider>
+    
   );
 }
