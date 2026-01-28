@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
    //const VideoContentJson = VIDEOSLIDESDUMMY;
    let audioFilesUrls: string[] = [];
 
-for (let i = 0; i < VideoContentJson?.length; i++) {//temporaire, just pour tester un seul slide à la fois
+for (let i = 0; i < VideoContentJson?.length; i++) { //temporaire, just pour tester un seul slide à la fois
     const narration = VideoContentJson[i].narration.fullText;
     
     const fonadaResult = await axios.post('https://api.fonada.ai/tts/generate-audio-large', // Remplacez par l'URL complète
@@ -70,6 +70,7 @@ for (let i = 0; i < VideoContentJson?.length; i++) {//temporaire, just pour test
         caption: captionsArray[index],
         audioFileUrl: audioFilesUrls[index]
     }).returning();
+    console.log("Inserted slide content:", result);
     });
 
     return NextResponse.json({ ...VideoContentJson, audioFilesUrls, captionsArray });
