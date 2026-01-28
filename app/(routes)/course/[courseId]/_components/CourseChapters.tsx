@@ -3,13 +3,28 @@ import { Course } from '@/type/CourseType';
 import { Player } from '@remotion/player';
 import { Dot } from 'lucide-react';
 import React from 'react'
-import ChapterVideo from './ChapterVideo';
+import ChapterComposition from './ChapterVideo';
+import { useCourseStore } from '@/app/store/useCourseStore';
 
 type Props = {
     course: Course | undefined;
 }
 
-const CourseChapters = ({ course }: Props) => {
+const CourseChapters = ({course}: Props) => {
+    const { durationbySlideId, isCalculated } = useCourseStore();
+    console.log('Duration by Slide ID:', durationbySlideId);
+    const slides = course?.chapterContentSlides || [];
+    console.log('Slides:', slides);
+    const GetChapterDurationInFrame = (chapterId: string) => {
+    if (!isCalculated) return 3000;
+    const total = (course?.chapterContentSlides || [])
+      .filter((slide) => {
+        return slide.chapterId.toLowerCase().trim() === chapterId.toLowerCase().trim();
+      })
+      .reduce((sum, slide) => sum + (durationbySlideId[slide.slideId] || 0), 0);
+
+    return total > 0 ? total : 3000; 
+  };
     return (
         <div className='max-w-6xl -mt-5 p-10 border rounded-3xl shadow w-full bg-background/80 backdrop-blur'>
             <div className='flex justify-between items-center'>
@@ -41,8 +56,13 @@ const CourseChapters = ({ course }: Props) => {
                                 </div>
                                 <div className='flex-1 w-full'>
                                     <Player
-                                        component={ChapterVideo}
-                                        durationInFrames={30}
+                                        component={ChapterComposition}
+                                        inputProps={{
+                                            // @ts-ignore
+                                            slides: slides.filter(slide => slide.chapterId === chapter.chapterId),
+                                            durationsBySlideId: durationbySlideId
+                                        }}
+                                        durationInFrames={GetChapterDurationInFrame(chapter?.chapterId) || 30}
                                         compositionWidth={1280}
                                         compositionHeight={720}
                                         fps={30}
